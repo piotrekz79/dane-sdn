@@ -122,7 +122,7 @@
 			"response": []
 		},
 		{
-			"name": "Add existing Queue ID entry to a QoS entry",
+			"name": "Add first Queue ID entry to a QoS entry",
 			"request": {
 				"url": "http://{{CONTROLLER-IP}}:8181/restconf/config/network-topology:network-topology/topology/ovsdb:1/node/ovsdb:DANE1/ovsdb:qos-entries/DANE-QOS-1/",
 				"method": "PUT",
@@ -137,7 +137,7 @@
 					"mode": "raw",
 					"raw": "{\n    \"ovsdb:qos-entries\": [\n        {\n            \"qos-id\": \"DANE-QOS-1\",\n            \"queue-list\": [\n                {\n                    \"queue-number\": \"1\",\n                    \"queue-ref\": \"/network-topology:network-topology/network-topology:topology[network-topology:topology-id='ovsdb:1']/network-topology:node[network-topology:node-id='ovsdb:DANE-HOST1']/ovsdb:queues[ovsdb:queue-id='DANE-QUEUE-1']\"\n                }\n            ]\n        }\n    ]\n}"
 				},
-				"description": "Add existing Queue ID entry to a QoS entry. Queue number 1 will be used on a switch"
+				"description": "Add existing Queue ID entry to a QoS entry. Queue number 1 will be used on a switch. Using this command for another queue will overwrite the config\nIn fact we an use POST \"Add (another) queue\" also for the first one"
 			},
 			"response": []
 		},
@@ -249,7 +249,7 @@
 			"response": []
 		},
 		{
-			"name": "Add another queue to the existing QoS group",
+			"name": "Add (another) queue to the existing QoS group",
 			"request": {
 				"auth": {
 					"type": "basic",
@@ -278,7 +278,7 @@
 					"mode": "raw",
 					"raw": "{\n            \"queue-list\": [\n                {\n                    \"queue-number\": \"2\",\n                    \"queue-ref\": \"/network-topology:network-topology/network-topology:topology[network-topology:topology-id='ovsdb:1']/network-topology:node[network-topology:node-id='ovsdb:DANE-HOST1']/ovsdb:queues[ovsdb:queue-id='DANE-QUEUE-2']\"\n                }\n            ]\n}"
 				},
-				"description": "Add another queue to the existing QoS group (do not use PUT, it will delete)"
+				"description": "Add (another) queue to the existing QoS group (do not use PUT, it will delete existing associations). Good also for the first queue"
 			},
 			"response": []
 		}
