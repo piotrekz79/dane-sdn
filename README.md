@@ -59,14 +59,14 @@ however, we need to create extra IDs
 
 PUT http://{{CONTROLLER-IP}}:8181/restconf/config/network-topology:network-topology/topology/ovsdb:1/node/ovsdb:DANE1%2Fbridge%2Fvs_sw/termination-point/vs_sw-eth2/
 
-{
-  "network-topology:termination-point": [
-    {
-      "ovsdb:name": "vs_sw-eth2",
-      "tp-id": "vs_sw-eth2"
-    }
-  ]
-}
+		{
+		  "network-topology:termination-point": [
+		    {
+		      "ovsdb:name": "vs_sw-eth2",
+		      "tp-id": "vs_sw-eth2"
+		    }
+		  ]
+		}
 
 
 
@@ -79,16 +79,16 @@ PUT
 
 http://{{CONTROLLER-IP}}:8181/restconf/config/network-topology:network-topology/topology/ovsdb:1/node/ovsdb:DANE1/ovsdb:qos-entries/DANE-QOS-1/
 
-{
-  "ovsdb:qos-entries": [
-    {
-      "qos-id": "DANE-QOS-1",
-      "qos-type": "ovsdb:qos-type-linux-htb"
-    }
-  ]
-}
+		{
+		  "ovsdb:qos-entries": [
+		    {
+		      "qos-id": "DANE-QOS-1",
+		      "qos-type": "ovsdb:qos-type-linux-htb"
+		    }
+		  ]
+		}
 
-
+	
 6. Add a Queue entry to the queues list of a ovsdb node 'DANE1'
 
 PUT http://{{CONTROLLER-IP}}:8181/restconf/config/network-topology:network-topology/topology/ovsdb:1/node/ovsdb:DANE1/ovsdb:queues/DANE-QUEUE-1/
@@ -111,7 +111,7 @@ PUT http://{{CONTROLLER-IP}}:8181/restconf/config/network-topology:network-topol
             "qos-id": "DANE-QOS-1",
             "queue-list": [
                 {
-                    "queue-number": "0",
+                    "queue-number": "1",
                     "queue-ref": "/network-topology:network-topology/network-topology:topology[network-topology:topology-id='ovsdb:1']/network-topology:node[network-topology:node-id='ovsdb:DANE-HOST1']/ovsdb:queues[ovsdb:queue-id='DANE-QUEUE-1']"
                 }
             ]

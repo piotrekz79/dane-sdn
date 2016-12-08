@@ -1,0 +1,286 @@
+{
+	"variables": [],
+	"info": {
+		"name": "DANE-SDN",
+		"_postman_id": "b10c8cee-267e-98b1-1f29-ac9f4b4b3ed4",
+		"description": "",
+		"schema": "https://schema.getpostman.com/json/collection/v2.0.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Configure ODL to communicate with the OVSDB",
+			"request": {
+				"url": "http://{{CONTROLLER-IP}}:8181/restconf/config/network-topology:network-topology/topology/ovsdb:1/",
+				"method": "POST",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Basic YWRtaW46YWRtaW4=",
+						"description": ""
+					},
+					{
+						"key": "Accept",
+						"value": "application/json",
+						"description": ""
+					},
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"description": ""
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "\r\n        {\r\n            \"node\": [\r\n                {\r\n                    \"node-id\": \"ovsdb:DANE1\",\r\n                    \"connection-info\": {\r\n                        \"ovsdb:remote-ip\": \"{{HYPERVISOR-IP}}\",\r\n                        \"ovsdb:remote-port\": \"{{HYPERVISOR-OVSDB-PORT}}\"\r\n                    }\r\n                }\r\n            ]\r\n        }\r\n"
+				},
+				"description": "Configure ODL to communicate with the OVSDB\n\nAn active connection is when the OVSDB Southbound Plugin initiates the connection to an OVS host. This happens when the OVS host is configured to listen for the connection (i.e. the OVSDB Southbound Plugin is active the the OVS host is passive). The OVS host is configured with the following command:\n\nsudo ovs-vsctl set-manager ptcp:6640\n\n6640 is the \"remote-port\" in this REST call\nhypervisor IP is the address of the machine where OVSDB is"
+			},
+			"response": []
+		},
+		{
+			"name": "Create termination point",
+			"request": {
+				"url": "http://{{CONTROLLER-IP}}:8181/restconf/config/network-topology:network-topology/topology/ovsdb:1/node/ovsdb:DANE1%2Fbridge%2Fvs_sw/termination-point/vs_sw-eth2/",
+				"method": "PUT",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Basic YWRtaW46YWRtaW4=",
+						"description": ""
+					},
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"description": ""
+					},
+					{
+						"key": "Accept",
+						"value": "application/json",
+						"description": ""
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"network-topology:termination-point\": [\n    {\n      \"ovsdb:name\": \"vs_sw-eth2\",\n      \"tp-id\": \"vs_sw-eth2\"\n    }\n  ]\n}"
+				},
+				"description": "Create termination point\n\nIf we use mininet to create switch, we do not need to add switch in ODL or create termination point - thery should be present, e.g., for vs_sw switch\n\nGET http://{{CONTROLLER-IP}}:8181/restconf/operational/network-topology:network-topology/topology/ovsdb:1/node/ovsdb:DANE1%2Fbridge%2Fvs_sw/\n\n\nhowever, we need to create extra IDs so we use this command"
+			},
+			"response": []
+		},
+		{
+			"name": "Add a QoS entry to a qos-entries list",
+			"request": {
+				"url": "http://{{CONTROLLER-IP}}:8181/restconf/config/network-topology:network-topology/topology/ovsdb:1/node/ovsdb:DANE1/ovsdb:qos-entries/DANE-QOS-1/",
+				"method": "PUT",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"description": ""
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"ovsdb:qos-entries\": [\n    {\n      \"qos-id\": \"DANE-QOS-1\",\n      \"qos-type\": \"ovsdb:qos-type-linux-htb\"\n    }\n  ]\n}"
+				},
+				"description": "Add a QoS entry to a qos-entries list"
+			},
+			"response": []
+		},
+		{
+			"name": "Add a Queue entry (without configuration) to the queues list",
+			"request": {
+				"auth": {
+					"type": "basic",
+					"basic": {
+						"username": "admin",
+						"password": "admin",
+						"saveHelperData": true,
+						"showPassword": false
+					}
+				},
+				"url": "http://{{CONTROLLER-IP}}:8181/restconf/config/network-topology:network-topology/topology/ovsdb:1/node/ovsdb:DANE1/ovsdb:queues/DANE-QUEUE-1/",
+				"method": "PUT",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"description": ""
+					},
+					{
+						"key": "Authorization",
+						"value": "Basic YWRtaW46YWRtaW4=",
+						"description": ""
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"ovsdb:queues\": [\n    {\n      \"queue-id\": \"DANE-QUEUE-1\"\n    }\n  ]\n}"
+				},
+				"description": "Add a Queue entry (without configuration) to the queues list of a ovsdb node 'DANE1'"
+			},
+			"response": []
+		},
+		{
+			"name": "Add existing Queue ID entry to a QoS entry",
+			"request": {
+				"url": "http://{{CONTROLLER-IP}}:8181/restconf/config/network-topology:network-topology/topology/ovsdb:1/node/ovsdb:DANE1/ovsdb:qos-entries/DANE-QOS-1/",
+				"method": "PUT",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"description": ""
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"ovsdb:qos-entries\": [\n        {\n            \"qos-id\": \"DANE-QOS-1\",\n            \"queue-list\": [\n                {\n                    \"queue-number\": \"1\",\n                    \"queue-ref\": \"/network-topology:network-topology/network-topology:topology[network-topology:topology-id='ovsdb:1']/network-topology:node[network-topology:node-id='ovsdb:DANE-HOST1']/ovsdb:queues[ovsdb:queue-id='DANE-QUEUE-1']\"\n                }\n            ]\n        }\n    ]\n}"
+				},
+				"description": "Add existing Queue ID entry to a QoS entry. Queue number 1 will be used on a switch"
+			},
+			"response": []
+		},
+		{
+			"name": "Add existing QoS ID to a termination point",
+			"request": {
+				"auth": {
+					"type": "basic",
+					"basic": {
+						"username": "admin",
+						"password": "admin",
+						"saveHelperData": true,
+						"showPassword": false
+					}
+				},
+				"url": "http://{{CONTROLLER-IP}}:8181/restconf/config/network-topology:network-topology/topology/ovsdb:1/node/ovsdb:DANE1%2Fbridge%2Fvs_sw/termination-point/vs_sw-eth2/",
+				"method": "PUT",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Basic YWRtaW46YWRtaW4=",
+						"description": ""
+					},
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"description": ""
+					},
+					{
+						"key": "Accept",
+						"value": "application/json",
+						"description": ""
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"network-topology:termination-point\": [\n    \t{\n \t  \t\t\"ovsdb:name\": \"vs_sw-eth2\",\n \t\t\t\"tp-id\": \"vs_sw-eth2\",\n \t\t\t\"ovsdb:qos-entry\": [\n                {\n                    \"qos-key\": 1,\n                    \"qos-ref\": \"/network-topology:network-topology/network-topology:topology[network-topology:topology-id='ovsdb:1']/network-topology:node[network-topology:node-id='ovsdb:DANE1']/ovsdb:qos-entries[ovsdb:qos-id='DANE-QOS-1']\"\n                }\n            ]\n  \t\t}\n    ]\n}"
+				},
+				"description": "Add existing QoS ID to a termination point"
+			},
+			"response": []
+		},
+		{
+			"name": "(Re)configure Queue",
+			"request": {
+				"auth": {
+					"type": "basic",
+					"basic": {
+						"username": "admin",
+						"password": "admin",
+						"saveHelperData": true,
+						"showPassword": false
+					}
+				},
+				"url": "http://{{CONTROLLER-IP}}:8181/restconf/config/network-topology:network-topology/topology/ovsdb:1/node/ovsdb:DANE1/ovsdb:queues/DANE-QUEUE-1/",
+				"method": "PUT",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"description": ""
+					},
+					{
+						"key": "Authorization",
+						"value": "Basic YWRtaW46YWRtaW4=",
+						"description": ""
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"ovsdb:queues\": [\n    {\n      \"queue-id\": \"DANE-QUEUE-1\",\n      \"queues-other-config\": [\n        {\n          \"queue-other-config-key\": \"max-rate\",\n          \"queue-other-config-value\": \"7200000\"\n        }\n      ]\n    }\n  ]\n}"
+				},
+				"description": "(Re)configure Queue"
+			},
+			"response": []
+		},
+		{
+			"name": "Create (another, configured) queue",
+			"request": {
+				"auth": {
+					"type": "basic",
+					"basic": {
+						"username": "admin",
+						"password": "admin",
+						"saveHelperData": true,
+						"showPassword": false
+					}
+				},
+				"url": "http://{{CONTROLLER-IP}}:8181/restconf/config/network-topology:network-topology/topology/ovsdb:1/node/ovsdb:DANE1/ovsdb:queues/DANE-QUEUE-2/",
+				"method": "PUT",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"description": ""
+					},
+					{
+						"key": "Authorization",
+						"value": "Basic YWRtaW46YWRtaW4=",
+						"description": ""
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"ovsdb:queues\": [\n    {\n      \"queue-id\": \"DANE-QUEUE-2\",\n      \"queues-other-config\": [\n        {\n          \"queue-other-config-key\": \"max-rate\",\n          \"queue-other-config-value\": \"5000000\"\n        }\n      ]\n    }\n  ]\n}"
+				},
+				"description": "Create (another, configured) queue"
+			},
+			"response": []
+		},
+		{
+			"name": "Add another queue to the existing QoS group",
+			"request": {
+				"auth": {
+					"type": "basic",
+					"basic": {
+						"username": "admin",
+						"password": "admin",
+						"saveHelperData": true,
+						"showPassword": false
+					}
+				},
+				"url": "http://{{CONTROLLER-IP}}:8181/restconf/config/network-topology:network-topology/topology/ovsdb:1/node/ovsdb:DANE1/ovsdb:qos-entries/DANE-QOS-1/",
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"description": ""
+					},
+					{
+						"key": "Authorization",
+						"value": "Basic YWRtaW46YWRtaW4=",
+						"description": ""
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n            \"queue-list\": [\n                {\n                    \"queue-number\": \"2\",\n                    \"queue-ref\": \"/network-topology:network-topology/network-topology:topology[network-topology:topology-id='ovsdb:1']/network-topology:node[network-topology:node-id='ovsdb:DANE-HOST1']/ovsdb:queues[ovsdb:queue-id='DANE-QUEUE-2']\"\n                }\n            ]\n}"
+				},
+				"description": "Add another queue to the existing QoS group (do not use PUT, it will delete)"
+			},
+			"response": []
+		}
+	]
+}
