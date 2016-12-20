@@ -72,11 +72,11 @@ class daneTopo(Topo):
         iperfPortBase=5000
 
 #        root = self.addHost('root', inNamespace=False, ip='10.10.10.2/24')
-
-        for j in range(1, nHosts + 1):
-            host = self.addHost('h%s' %j, cls=IperfSinkHost, ip='10.0.0.%s/24' %j, mac='00:10:00:00:00:0%s' %j,
-                                remoteIP=vsIP, remoteMAC=vsMAC, iperfPort = str(iperfPortBase + j))
-            self.addLink(host, hgw_sw)
+#no hosts, just add ens192 to hgw_sw
+#        for j in range(1, nHosts + 1):
+#            host = self.addHost('h%s' %j, cls=IperfSinkHost, ip='10.0.0.%s/24' %j, mac='00:10:00:00:00:0%s' %j,
+#                                remoteIP=vsIP, remoteMAC=vsMAC, iperfPort = str(iperfPortBase + j))
+#            self.addLink(host, hgw_sw)
 #            self.addLink(root, host)
 
         vs = self.addHost('vs', cls=IperfSourceHost, ip='%s/24' %vsIP, mac=vsMAC,nHosts = nHosts)
